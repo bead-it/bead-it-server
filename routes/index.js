@@ -1,10 +1,9 @@
-const express = require('express');
+const beadworkRouter = require('./beadworkRouter');
+const beadRouter = require('./beadRouter');
+const threadRouter = require('./threadRouter');
 
-const router = express.Router();
-
-/* GET home page. */
-router.get('/', function (req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
-module.exports = router;
+module.exports = {
+  beadworkRouter,
+  beadRouter,
+  threadRouter,
+};
