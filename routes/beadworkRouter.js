@@ -1,4 +1,9 @@
 const express = require('express');
 
+const { auth } = require('./middlewares/authMiddlewares');
+const { getBeadworkData } = require('./middlewares/beadworkMiddlewares');
+const { endOfGetReq } = require('./controllers/responseControllers');
+
 const router = express.Router();
-console.log('🚀 ~ file: beadworkRouter.js ~ line 4 ~ router', router);
+
+router.route('/:beadworkId').get(auth, getBeadworkData, endOfGetReq);
