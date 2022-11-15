@@ -3,10 +3,10 @@ const Beadwork = require('../../models/Beadwork');
 
 const getBeadData = async (req, res, next) => {
   try {
-    const { beadworkId } = res.locals;
+    const { beadworkId } = res.params;
     if (!beadworkId) {
       const error = new Error('No beadworkId delivered!!');
-      error.status = 500;
+      error.status = 400;
       throw error;
     }
 
@@ -41,10 +41,10 @@ const getBeadData = async (req, res, next) => {
 
 const getAllBeadData = async (req, res, next) => {
   try {
-    const { beadworkId } = res.locals;
+    const { beadworkId } = res.params;
     if (!beadworkId) {
       const error = new Error('No beadworkId delivered!!');
-      error.status = 500;
+      error.status = 400;
       throw error;
     }
 
@@ -74,4 +74,4 @@ const postBeadData = () => {};
 
 const patchBeadData = () => {};
 
-export { getBeadData, getAllBeadData, postBeadData, patchBeadData };
+module.exports = { getBeadData, getAllBeadData, postBeadData, patchBeadData };

@@ -4,4 +4,4 @@ const auth = (req, res, next) => {
 
 const auth2 = () => {};
 
-export { auth, auth2 };
+module.exports = { auth, auth2 };

@@ -17,4 +17,4 @@ const endOfPostReq = () => {};
 
 const endOfPatchReq = () => {};
 
-export { endOfGetReq, endOfPostReq, endOfPatchReq };
+module.exports = { endOfGetReq, endOfPostReq, endOfPatchReq };

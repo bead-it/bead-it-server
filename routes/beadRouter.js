@@ -7,8 +7,10 @@ const {
 } = require('./middlewares/beadMiddlewares');
 const { endOfGetReq } = require('./controllers/responseControllers');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.route('/').get(auth, getAllBeadData, endOfGetReq);
 
 router.route('/:beadId').get(auth, getBeadData, endOfGetReq);
+
+module.exports = router;

@@ -30,4 +30,4 @@ const postBeadworkData = () => {};
 
 const patchBeadworkData = () => {};
 
-export { getBeadworkData, postBeadworkData, patchBeadworkData };
+module.exports = { getBeadworkData, postBeadworkData, patchBeadworkData };
