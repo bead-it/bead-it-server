@@ -2,9 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const logger = require('morgan');
 
-const { beadworkRouter, beadRouter, threadRouter } = require('./routes/index');
+const baseRouter = require('./routes/index');
 
 const app = express();
+
+require('./configs/dbConfig')();
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -17,9 +19,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/users/:userId/beadworks', beadworkRouter);
-app.use('/users/:userId/beadworks/:beadworkId/beads', beadRouter);
-app.use('/users/:userId/beadworks/:beadworkId/threads', threadRouter);
+app.use('/', baseRouter);
 
 app.use((req, res, next) => {
   const error = new Error('Page Not Found');
@@ -38,7 +38,7 @@ app.use((err, req, res, next) => {
   };
 
   console.error(err);
-  res.json(responseBody);
+  res.status(responseBody.code).json(responseBody);
 });
 
 module.exports = app;
