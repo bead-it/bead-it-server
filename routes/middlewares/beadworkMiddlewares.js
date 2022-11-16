@@ -9,7 +9,7 @@ const getBeadworkData = async (req, res, next) => {
       throw error;
     }
 
-    const beadwork = await Beadwork.findById(beadworkId);
+    const beadwork = await Beadwork.findById(beadworkId).exec();
     if (!beadwork) {
       const error = new Error('Invalid beadworkId!!');
       error.status = 400;
@@ -26,7 +26,31 @@ const getBeadworkData = async (req, res, next) => {
   }
 };
 
-const postBeadworkData = () => {};
+const postBeadworkData = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      const error = new Error('No userId delivered!!');
+      error.status = 400;
+      throw error;
+    }
+
+    const beadwork = await Beadwork.create({
+      author: userId,
+    });
+    if (!beadwork) {
+      throw new Error('Not created!!');
+    }
+
+    res.locals.data = beadwork;
+
+    next();
+  } catch (error) {
+    error.message = `Error in postBeadworkData in beadworkMiddlewares.js : ${error.message}`;
+
+    next(error);
+  }
+};
 
 const patchBeadworkData = () => {};
 

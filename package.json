@@ -6,7 +6,7 @@
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
     "pre-commit": "lint-staged && rm -rf .git/hooks && ln -s ../.husky .git/hooks",
-    "prepare": "'npm run pre-commit'"
+    "prepare": "npm run pre-commit"
   },
   "lint-staged": {
     "**/*.{js, html, css, json}": [

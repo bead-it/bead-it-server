@@ -1,5 +1,6 @@
 const Bead = require('../../models/Bead');
 const Beadwork = require('../../models/Beadwork');
+const Page = require('../../models/Page');
 
 const getBeadData = async (req, res, next) => {
   try {
@@ -70,7 +71,57 @@ const getAllBeadData = async (req, res, next) => {
   }
 };
 
-const postBeadData = () => {};
+const postBeadData = async (req, res, next) => {
+  try {
+    const { beadworkId } = req.params;
+    if (!beadworkId) {
+      const error = new Error('No beadworkId delivered!!');
+      error.status = 400;
+      throw error;
+    }
+
+    const { domain, url, title, keywords } = req.body;
+    if (!(domain && url && title && keywords)) {
+      const error = new Error('Not all data required delivered!!');
+      error.status = 400;
+      throw error;
+    }
+
+    let page = await Page.findOneAndUpdate(
+      { domain, url },
+      { title, keywords },
+      { returnDocument: 'after' },
+    );
+    if (!page) {
+      page = await Page.create({ domain, url, title, keywords });
+    }
+
+    const bead = await Bead.create({ page, beadwork: beadworkId });
+    if (!(page && bead)) {
+      throw new Error('Not created!!');
+    }
+
+    const { _id: beadId } = bead;
+    const beadwork = await Beadwork.findByIdAndUpdate(
+      beadworkId,
+      { $push: { beads: beadId } },
+      { returnDocument: 'after' },
+    ).exec();
+    if (!beadwork) {
+      throw new Error('Not updated!!');
+    }
+
+    bead.populate('page').exec();
+
+    res.locals.data = bead;
+
+    next();
+  } catch (error) {
+    error.message = `Error in postBeadData in beadMiddlewares.js : ${error.message}`;
+
+    next(error);
+  }
+};
 
 const patchBeadData = () => {};
 
