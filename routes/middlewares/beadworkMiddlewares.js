@@ -36,6 +36,13 @@ const postBeadworkData = async (req, res, next) => {
       throw error;
     }
 
+    const user = await User.findById(userId).exec();
+    if (!user) {
+      const error = new Error('Invalid userId!!');
+      error.status = 400;
+      throw error;
+    }
+
     const beadwork = await Beadwork.create({
       author: userId,
     });
@@ -45,12 +52,12 @@ const postBeadworkData = async (req, res, next) => {
 
     const { _id: beadworkId } = beadwork;
 
-    const user = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $push: { beadworks: beadworkId } },
       { returnDocument: 'after' },
     ).exec();
-    if (!user) {
+    if (!updatedUser) {
       throw new Error('Not updated!!');
     }
 
@@ -95,7 +102,12 @@ const patchBeadworkData = async (req, res, next) => {
 
     const user = await User.findById(userId).exec();
     const beadwork = await Beadwork.findById(beadworkId).exec();
-    if (!user.myBeadworks.includes(beadworkId) || beadwork.author !== userId) {
+    if (
+      !user ||
+      !beadwork ||
+      !user.myBeadworks.map(objId => objId.toString()).includes(beadworkId) ||
+      beadwork.author.toString() !== userId
+    ) {
       const error = new Error('UserId is not matched with beadworkId!!');
       error.status = 400;
       throw error;

@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 const beadworkSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true, default: '' },
-    description: { type: String, required: true, default: '' },
+    title: { type: String, required: true, default: 'untitled' },
+    description: { type: String, default: '' },
     author: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

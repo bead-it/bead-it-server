@@ -12,7 +12,7 @@ const threadSchema = new mongoose.Schema(
       required: true,
       ref: 'Bead',
     },
-    content: { type: String, required: true, default: '' },
+    content: { type: String, default: '' },
     beadwork: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
