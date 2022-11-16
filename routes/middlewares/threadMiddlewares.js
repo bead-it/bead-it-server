@@ -4,7 +4,7 @@ const User = require('../../models/User');
 
 const getThreadData = async (req, res, next) => {
   try {
-    const { beadworkId } = res.params;
+    const { beadworkId } = req.params;
     if (!beadworkId) {
       const error = new Error('No beadworkId delivered!!');
       error.status = 400;
@@ -24,7 +24,7 @@ const getThreadData = async (req, res, next) => {
       error.status = 400;
       throw error;
     }
-    if (thread.beadwork !== beadworkId) {
+    if (thread.beadwork.toString() !== beadworkId) {
       const error = new Error('BeadworkId is not matched with threadId!!');
       error.status = 400;
       throw error;
@@ -42,7 +42,7 @@ const getThreadData = async (req, res, next) => {
 
 const getAllThreadData = async (req, res, next) => {
   try {
-    const { beadworkId } = res.params;
+    const { beadworkId } = req.params;
     if (!beadworkId) {
       const error = new Error('No beadworkId delivered!!');
       error.status = 400;
@@ -77,6 +77,13 @@ const postThreadData = async (req, res, next) => {
       throw error;
     }
 
+    const beadwork = await Beadwork.findById(beadworkId).exec();
+    if (!beadwork) {
+      const error = new Error('Invalid beadworkId!!');
+      error.status = 400;
+      throw error;
+    }
+
     const { source, target } = req.body;
     if (!(source && target)) {
       const error = new Error('Not all data required delivered!!');
@@ -94,12 +101,12 @@ const postThreadData = async (req, res, next) => {
     }
 
     const { _id: threadId } = thread;
-    const beadwork = await Beadwork.findByIdAndUpdate(
+    const updatedBeadwork = await Beadwork.findByIdAndUpdate(
       beadworkId,
       { $push: { threads: threadId } },
       { returnDocument: 'after' },
     ).exec();
-    if (!beadwork) {
+    if (!updatedBeadwork) {
       throw new Error('Not updated!!');
     }
 
@@ -154,10 +161,11 @@ const patchThreadData = async (req, res, next) => {
     const beadwork = await Beadwork.findById(beadworkId).exec();
     const thread = await Thread.findById(threadId).exec();
     if (
-      !user.myBeadworks.includes(beadworkId) ||
-      beadwork.author !== userId ||
-      !beadwork.threads.includes(threadId) ||
-      thread.beadwork !== beadworkId
+      !(user && beadwork && thread) ||
+      !user.myBeadworks.map(objId => objId.toString()).includes(beadworkId) ||
+      beadwork.author.toString() !== userId ||
+      !beadwork.threads.map(objId => objId.toString()).includes(threadId) ||
+      thread.beadwork.toString() !== beadworkId
     ) {
       const error = new Error(
         'UserId, beadworkId, and threadId are not matched!!',

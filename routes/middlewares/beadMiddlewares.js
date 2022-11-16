@@ -5,7 +5,7 @@ const User = require('../../models/User');
 
 const getBeadData = async (req, res, next) => {
   try {
-    const { beadworkId } = res.params;
+    const { beadworkId } = req.params;
     if (!beadworkId) {
       const error = new Error('No beadworkId delivered!!');
       error.status = 400;
@@ -25,7 +25,7 @@ const getBeadData = async (req, res, next) => {
       error.status = 400;
       throw error;
     }
-    if (bead.beadwork !== beadworkId) {
+    if (bead.beadwork.toString() !== beadworkId) {
       const error = new Error('BeadworkId is not matched with beadId!!');
       error.status = 400;
       throw error;
@@ -43,7 +43,7 @@ const getBeadData = async (req, res, next) => {
 
 const getAllBeadData = async (req, res, next) => {
   try {
-    const { beadworkId } = res.params;
+    const { beadworkId } = req.params;
     if (!beadworkId) {
       const error = new Error('No beadworkId delivered!!');
       error.status = 400;
@@ -51,7 +51,7 @@ const getAllBeadData = async (req, res, next) => {
     }
 
     const beadwork = await Beadwork.findById(beadworkId).populate({
-      path: 'bead',
+      path: 'beads',
       populate: {
         path: 'page',
       },
@@ -81,6 +81,13 @@ const postBeadData = async (req, res, next) => {
       throw error;
     }
 
+    const beadwork = await Beadwork.findById(beadworkId).exec();
+    if (!beadwork) {
+      const error = new Error('Invalid beadworkId!!');
+      error.status = 400;
+      throw error;
+    }
+
     const { domain, url, title, keywords } = req.body;
     if (!(domain && url && title && keywords)) {
       const error = new Error('Not all data required delivered!!');
@@ -103,16 +110,16 @@ const postBeadData = async (req, res, next) => {
     }
 
     const { _id: beadId } = bead;
-    const beadwork = await Beadwork.findByIdAndUpdate(
+    const updatedBeadwork = await Beadwork.findByIdAndUpdate(
       beadworkId,
       { $push: { beads: beadId } },
       { returnDocument: 'after' },
     ).exec();
-    if (!beadwork) {
+    if (!updatedBeadwork) {
       throw new Error('Not updated!!');
     }
 
-    bead.populate('page').exec();
+    bead.populate('page');
 
     res.locals.data = bead;
 
@@ -154,10 +161,11 @@ const patchBeadData = async (req, res, next) => {
     const beadwork = await Beadwork.findById(beadworkId).exec();
     const bead = await Bead.findById(beadId).exec();
     if (
-      !user.myBeadworks.includes(beadworkId) ||
-      beadwork.author !== userId ||
-      !beadwork.beads.includes(beadId) ||
-      bead.beadwork !== beadworkId
+      !(user && beadwork && bead) ||
+      !user.myBeadworks.map(objId => objId.toString()).includes(beadworkId) ||
+      beadwork.author.toString() !== userId ||
+      !beadwork.beads.map(objId => objId.toString()).includes(beadId) ||
+      bead.beadwork.toString() !== beadworkId
     ) {
       const error = new Error(
         'UserId, beadworkId, and beadId are not matched!!',

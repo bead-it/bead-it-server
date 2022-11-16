@@ -1,15 +1,30 @@
+const { expect } = require('chai');
 const request = require('supertest');
 const app = require('../app');
+const {
+  createTestData,
+  deleteTestData,
+  backupOriginalData,
+  restoreOriginalData,
+} = require('./testUtils');
 
 const requestApp = request.agent(app);
+let backupData;
 
 describe('01. Beadwork test', () => {
+  it('start', async () => {
+    backupData = await backupOriginalData();
+    await deleteTestData();
+    await createTestData();
+  });
+
   it('01-1. Get beadwork data with valid beadworkId.', done => {
     requestApp
       .get('/users/6374905f40e097569b7dd970/beadworks/637492f5bc1aff2ace0a2191')
-      .expect({
-        result: 'ok',
-        data: {
+      .expect(200)
+      .expect(res => {
+        expect(res.body.result).equal('ok');
+        expect(res.body.data).to.deep.include({
           _id: '637492f5bc1aff2ace0a2191',
           title: 'first beadwork!',
           description: 'beadwork 1!!',
@@ -38,10 +53,7 @@ describe('01. Beadwork test', () => {
             '63749732486fe6325f548f32',
             '63749732486fe6325f548f33',
           ],
-          __v: 0,
-          createdAt: '2022-11-16T08:08:31.920Z',
-          updatedAt: '2022-11-16T08:08:31.920Z',
-        },
+        });
       })
       .end(error => {
         if (error) done(error);
@@ -52,6 +64,7 @@ describe('01. Beadwork test', () => {
   it('01-2. Get beadwork data with invalid beadworkId.', done => {
     requestApp
       .get('/users/6374905f40e097569b7dd970/beadworks/637492f5bc1aff2ace0a2190')
+      .expect(400)
       .expect({
         result: 'error',
         code: 400,
@@ -67,19 +80,16 @@ describe('01. Beadwork test', () => {
   it('01-3. Post beadwork with valid userId.', done => {
     requestApp
       .post('/users/6374905f40e097569b7dd970/beadworks')
-      .expect({
-        result: 'ok',
-        data: {
+      .expect(201)
+      .expect(res => {
+        expect(res.body.result).equal('ok');
+        expect(res.body.data).to.deep.include({
           title: 'untitled',
           description: '',
           author: '6374905f40e097569b7dd970',
           beads: [],
           threads: [],
-          _id: '63749fb55a200a90ac9d16ad',
-          createdAt: '2022-11-16T08:30:45.978Z',
-          updatedAt: '2022-11-16T08:30:45.978Z',
-          __v: 0,
-        },
+        });
       })
       .end(error => {
         if (error) done(error);
@@ -90,6 +100,7 @@ describe('01. Beadwork test', () => {
   it('01-4. Post beadwork with invalid userId.', done => {
     requestApp
       .post('/users/6374905f40e097569b7dd969/beadworks')
+      .expect(400)
       .expect({
         result: 'error',
         code: 400,
@@ -107,6 +118,11 @@ describe('01. Beadwork test', () => {
       .patch(
         '/users/6374905f40e097569b7dd970/beadworks/637492f5bc1aff2ace0a2191',
       )
+      .send({
+        title: 'title1',
+        description: 'description1',
+      })
+      .expect(200)
       .expect({
         result: 'ok',
       })
@@ -121,6 +137,11 @@ describe('01. Beadwork test', () => {
       .patch(
         '/users/6374905f40e097569b7dd969/beadworks/637492f5bc1aff2ace0a2191',
       )
+      .send({
+        title: 'title1',
+        description: 'description1',
+      })
+      .expect(400)
       .expect({
         result: 'error',
         code: 400,
@@ -136,9 +157,9 @@ describe('01. Beadwork test', () => {
   it('01-7. Patch beadwork without body data.', done => {
     requestApp
       .patch(
-        // without body data
         '/users/6374905f40e097569b7dd970/beadworks/637492f5bc1aff2ace0a2191',
       )
+      .expect(400)
       .expect({
         result: 'error',
         code: 400,
@@ -149,5 +170,10 @@ describe('01. Beadwork test', () => {
         if (error) done(error);
         done();
       });
+  });
+
+  it('end', async () => {
+    await deleteTestData();
+    await restoreOriginalData(backupData);
   });
 });
