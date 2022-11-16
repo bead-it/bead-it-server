@@ -1,4 +1,5 @@
 const Beadwork = require('../../models/Beadwork');
+const User = require('../../models/User');
 
 const getBeadworkData = async (req, res, next) => {
   try {
@@ -42,6 +43,17 @@ const postBeadworkData = async (req, res, next) => {
       throw new Error('Not created!!');
     }
 
+    const { _id: beadworkId } = beadwork;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $push: { beadworks: beadworkId } },
+      { returnDocument: 'after' },
+    ).exec();
+    if (!user) {
+      throw new Error('Not updated!!');
+    }
+
     res.locals.data = beadwork;
 
     next();
@@ -52,6 +64,58 @@ const postBeadworkData = async (req, res, next) => {
   }
 };
 
-const patchBeadworkData = () => {};
+const patchBeadworkData = async (req, res, next) => {
+  try {
+    const { userId, beadworkId } = req.params;
+    if (!userId) {
+      const error = new Error('No userId delivered!!');
+      error.status = 400;
+      throw error;
+    }
+    if (!beadworkId) {
+      const error = new Error('No beadworkId delivered!!');
+      error.status = 400;
+      throw error;
+    }
+
+    const { title, description } = req.body;
+    if (!title && !description) {
+      const error = new Error('No data delivered!!');
+      error.status = 400;
+      throw error;
+    }
+
+    const updateTarget = {};
+    if (title) {
+      updateTarget.title = title;
+    }
+    if (description) {
+      updateTarget.description = description;
+    }
+
+    const user = await User.findById(userId).exec();
+    const beadwork = await Beadwork.findById(beadworkId).exec();
+    if (!user.myBeadworks.includes(beadworkId) || beadwork.author !== userId) {
+      const error = new Error('UserId is not matched with beadworkId!!');
+      error.status = 400;
+      throw error;
+    }
+
+    const updatedBeadwork = await Beadwork.findByIdAndUpdate(
+      beadworkId,
+      updateTarget,
+      { returnDocument: 'after' },
+    ).exec();
+    if (!updatedBeadwork) {
+      throw new Error('Not updated!!');
+    }
+
+    next();
+  } catch (error) {
+    error.message = `Error in patchBeadworkData in beadworkMiddlewares.js : ${error.message}`;
+
+    next(error);
+  }
+};
 
 module.exports = { getBeadworkData, postBeadworkData, patchBeadworkData };

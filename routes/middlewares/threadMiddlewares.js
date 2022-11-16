@@ -1,5 +1,6 @@
 const Thread = require('../../models/Thread');
 const Beadwork = require('../../models/Beadwork');
+const User = require('../../models/User');
 
 const getThreadData = async (req, res, next) => {
   try {
@@ -112,7 +113,75 @@ const postThreadData = async (req, res, next) => {
   }
 };
 
-const patchThreadData = () => {};
+const patchThreadData = async (req, res, next) => {
+  try {
+    const { userId, beadworkId, threadId } = req.params;
+    if (!userId) {
+      const error = new Error('No userId delivered!!');
+      error.status = 400;
+      throw error;
+    }
+    if (!beadworkId) {
+      const error = new Error('No beadworkId delivered!!');
+      error.status = 400;
+      throw error;
+    }
+    if (!threadId) {
+      const error = new Error('No threadId delivered!!');
+      error.status = 400;
+      throw error;
+    }
+
+    const { source, target, contents } = req.body;
+    if (!source && !target && !contents) {
+      const error = new Error('No data delivered!!');
+      error.status = 400;
+      throw error;
+    }
+
+    const updateTarget = {};
+    if (source) {
+      updateTarget.source = source;
+    }
+    if (target) {
+      updateTarget.target = target;
+    }
+    if (contents) {
+      updateTarget.contents = contents;
+    }
+
+    const user = await User.findById(userId).exec();
+    const beadwork = await Beadwork.findById(beadworkId).exec();
+    const thread = await Thread.findById(threadId).exec();
+    if (
+      !user.myBeadworks.includes(beadworkId) ||
+      beadwork.author !== userId ||
+      !beadwork.threads.includes(threadId) ||
+      thread.beadwork !== beadworkId
+    ) {
+      const error = new Error(
+        'UserId, beadworkId, and threadId are not matched!!',
+      );
+      error.status = 400;
+      throw error;
+    }
+
+    const updatedThread = await Thread.findByIdAndUpdate(
+      threadId,
+      updateTarget,
+      { returnDocument: 'after' },
+    ).exec();
+    if (!updatedThread) {
+      throw new Error('Not updated!!');
+    }
+
+    next();
+  } catch (error) {
+    error.message = `Error in patchThreadData in threadMiddlewares.js : ${error.message}`;
+
+    next(error);
+  }
+};
 
 module.exports = {
   getThreadData,

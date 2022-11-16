@@ -1,6 +1,7 @@
 const Bead = require('../../models/Bead');
 const Beadwork = require('../../models/Beadwork');
 const Page = require('../../models/Page');
+const User = require('../../models/User');
 
 const getBeadData = async (req, res, next) => {
   try {
@@ -123,6 +124,63 @@ const postBeadData = async (req, res, next) => {
   }
 };
 
-const patchBeadData = () => {};
+const patchBeadData = async (req, res, next) => {
+  try {
+    const { userId, beadworkId, beadId } = req.params;
+    if (!userId) {
+      const error = new Error('No userId delivered!!');
+      error.status = 400;
+      throw error;
+    }
+    if (!beadworkId) {
+      const error = new Error('No beadworkId delivered!!');
+      error.status = 400;
+      throw error;
+    }
+    if (!beadId) {
+      const error = new Error('No beadId delivered!!');
+      error.status = 400;
+      throw error;
+    }
+
+    const { tags } = req.body;
+    if (!tags) {
+      const error = new Error('No data delivered!!');
+      error.status = 400;
+      throw error;
+    }
+
+    const user = await User.findById(userId).exec();
+    const beadwork = await Beadwork.findById(beadworkId).exec();
+    const bead = await Bead.findById(beadId).exec();
+    if (
+      !user.myBeadworks.includes(beadworkId) ||
+      beadwork.author !== userId ||
+      !beadwork.beads.includes(beadId) ||
+      bead.beadwork !== beadworkId
+    ) {
+      const error = new Error(
+        'UserId, beadworkId, and beadId are not matched!!',
+      );
+      error.status = 400;
+      throw error;
+    }
+
+    const updatedBead = await Bead.findByIdAndUpdate(
+      beadId,
+      { tags },
+      { returnDocument: 'after' },
+    ).exec();
+    if (!updatedBead) {
+      throw new Error('Not updated!!');
+    }
+
+    next();
+  } catch (error) {
+    error.message = `Error in patchBeadData in beadMiddlewares.js : ${error.message}`;
+
+    next(error);
+  }
+};
 
 module.exports = { getBeadData, getAllBeadData, postBeadData, patchBeadData };

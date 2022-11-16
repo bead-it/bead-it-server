@@ -28,6 +28,8 @@ const endOfPostReq = (req, res, next) => {
   }
 };
 
-const endOfPatchReq = () => {};
+const endOfPatchReq = (req, res) => {
+  res.status(200).json({ result: 'ok' });
+};
 
 module.exports = { endOfGetReq, endOfPostReq, endOfPatchReq };
