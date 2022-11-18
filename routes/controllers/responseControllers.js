@@ -29,7 +29,7 @@ const endOfPostReq = (req, res, next) => {
 };
 
 const endOfPatchReq = (req, res) => {
-  res.status(200).json({ result: 'ok' });
+  res.status(204).end();
 };
 
 module.exports = { endOfGetReq, endOfPostReq, endOfPatchReq };

@@ -122,10 +122,7 @@ describe('01. Beadwork test', () => {
         title: 'title1',
         description: 'description1',
       })
-      .expect(200)
-      .expect({
-        result: 'ok',
-      })
+      .expect(204)
       .end(error => {
         if (error) done(error);
         done();
