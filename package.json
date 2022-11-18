@@ -7,7 +7,7 @@
     "dev": "nodemon ./bin/www",
     "spec": "mocha spec --sort --exit",
     "pre-commit": "lint-staged && rm -rf .git/hooks && ln -s ../.husky .git/hooks && npm run spec",
-    "prepare": "npm run pre-commit"
+    "prepare": "lint-staged"
   },
   "lint-staged": {
     "**/*.{js, html, css, json}": [
