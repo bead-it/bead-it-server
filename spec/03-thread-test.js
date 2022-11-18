@@ -127,10 +127,7 @@ describe('03. Thread test', () => {
         target: '6374964d690ff5cb4a2f7396',
         content: 'new contents!!',
       })
-      .expect(200)
-      .expect({
-        result: 'ok',
-      })
+      .expect(204)
       .end(error => {
         if (error) done(error);
         done();

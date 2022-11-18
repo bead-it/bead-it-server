@@ -146,10 +146,7 @@ describe('02. Bead test', () => {
       .send({
         tags: ['newtag_1', 'newtag_2', 'newtag_3'],
       })
-      .expect(200)
-      .expect({
-        result: 'ok',
-      })
+      .expect(204)
       .end(error => {
         if (error) done(error);
         done();
