@@ -12,7 +12,7 @@ const requestApp = request.agent(app);
 let backupData;
 
 describe('01. Beadwork test', () => {
-  it('start', async () => {
+  xit('start', async () => {
     backupData = await backupOriginalData();
     await deleteTestData();
     await createTestData();
