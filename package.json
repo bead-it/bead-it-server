@@ -6,8 +6,7 @@
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
     "spec": "mocha spec --sort --exit",
-    "pre-commit": "lint-staged && rm -rf .git/hooks && ln -s ../.husky .git/hooks && npm run spec",
-    "prepare": "lint-staged"
+    "pre-commit": "lint-staged && rm -rf .git/hooks && ln -s ../.husky .git/hooks && npm run spec"
   },
   "lint-staged": {
     "**/*.{js, html, css, json}": [
