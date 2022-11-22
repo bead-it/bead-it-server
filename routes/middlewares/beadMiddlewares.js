@@ -50,12 +50,14 @@ const getAllBeadData = async (req, res, next) => {
       throw error;
     }
 
-    const beadwork = await Beadwork.findById(beadworkId).populate({
-      path: 'beads',
-      populate: {
-        path: 'page',
-      },
-    });
+    const beadwork = await Beadwork.findById(beadworkId)
+      .populate({
+        path: 'beads',
+        populate: {
+          path: 'page',
+        },
+      })
+      .exec();
     if (!beadwork) {
       const error = new Error('Invalid beadworkId!!');
       error.status = 400;

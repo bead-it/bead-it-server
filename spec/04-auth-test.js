@@ -3,9 +3,17 @@ const { expect } = require('chai');
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
 
+const {
+  createTestData,
+  deleteTestData,
+  backupOriginalData,
+  restoreOriginalData,
+} = require('./testUtils');
 const { authTemp } = require('../routes/middlewares/authMiddlewares');
 
 const testExpress = express();
+let backupData;
+
 testExpress.use(
   '/users/:userId/test-1',
   authTemp,
@@ -23,6 +31,12 @@ testExpress.use(
 );
 
 describe('04. Authentication test', () => {
+  it('start', async () => {
+    backupData = await backupOriginalData();
+    await deleteTestData();
+    await createTestData();
+  });
+
   it('04-1. Pass auth middleware with valid token.', done => {
     const testToken = jwt.sign(
       { test: 'This is test token', email: 'ltg0513@gmail.com' },
@@ -31,7 +45,7 @@ describe('04. Authentication test', () => {
 
     request
       .agent(testExpress)
-      .get('/users/6375dfeb8d8386b5205a9b4b/test-1')
+      .get('/users/637cbc4c71a61ffc5a10acee/test-1')
       .set('Authorization', `Bearer ${testToken}`)
       .expect(200)
       .expect({ result: 'ok' })
@@ -46,7 +60,7 @@ describe('04. Authentication test', () => {
 
     request
       .agent(testExpress)
-      .get('/users/6375dfeb8d8386b5205a9b4b/test-1')
+      .get('/users/637cbc4c71a61ffc5a10acee/test-1')
       .set('Authorization', `Bearer ${testToken}`)
       .expect(401)
       .expect(res => {
@@ -60,5 +74,10 @@ describe('04. Authentication test', () => {
         if (error) done(error);
         done();
       });
+  });
+
+  it('end', async () => {
+    await deleteTestData();
+    await restoreOriginalData(backupData);
   });
 });

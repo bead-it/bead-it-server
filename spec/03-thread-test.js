@@ -21,7 +21,7 @@ describe('03. Thread test', () => {
   it('03-1. Get thread data with valid threadId.', done => {
     requestApp
       .get(
-        '/users/6374905f40e097569b7dd970/beadworks/637492f5bc1aff2ace0a2191/threads/63749732486fe6325f548f2a',
+        '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191/threads/63749732486fe6325f548f2a',
       )
       .expect(200)
       .expect(res => {
@@ -43,7 +43,7 @@ describe('03. Thread test', () => {
   it('03-2. Get thread data with invalid beadworkId.', done => {
     requestApp
       .get(
-        '/users/6374905f40e097569b7dd970/beadworks/637492f5bc1aff2ace0a2190/threads/63749732486fe6325f548f2a',
+        '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2190/threads/63749732486fe6325f548f2a',
       )
       .expect(400)
       .expect({
@@ -61,7 +61,7 @@ describe('03. Thread test', () => {
   it('03-3. Get all threads data with valid beadworkId.', done => {
     requestApp
       .get(
-        '/users/6374905f40e097569b7dd970/beadworks/637492f5bc1aff2ace0a2191/threads/',
+        '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191/threads/',
       )
       .expect(200)
       .expect(res => {
@@ -77,7 +77,7 @@ describe('03. Thread test', () => {
   it('03-4. Get all threads data with invalid beadworkId.', done => {
     requestApp
       .get(
-        '/users/6374905f40e097569b7dd970/beadworks/637492f5bc1aff2ace0a2190/beads',
+        '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2190/beads',
       )
       .expect(400)
       .expect({
@@ -95,7 +95,7 @@ describe('03. Thread test', () => {
   it('03-5. Post thread with valid beadworkId and data.', done => {
     requestApp
       .post(
-        '/users/6374905f40e097569b7dd970/beadworks/637492f5bc1aff2ace0a2191/threads',
+        '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191/threads',
       )
       .send({
         source: '6374964d690ff5cb4a2f7395',
@@ -120,7 +120,7 @@ describe('03. Thread test', () => {
   it('03-6. Patch thread with valid beadworkId and data.', done => {
     requestApp
       .patch(
-        '/users/6374905f40e097569b7dd970/beadworks/637492f5bc1aff2ace0a2191/threads/63749732486fe6325f548f2a',
+        '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191/threads/63749732486fe6325f548f2a',
       )
       .send({
         source: '6374964d690ff5cb4a2f7397',
