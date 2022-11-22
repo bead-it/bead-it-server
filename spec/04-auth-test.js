@@ -39,13 +39,13 @@ describe('04. Authentication test', () => {
 
   it('04-1. Pass auth middleware with valid token.', done => {
     const testToken = jwt.sign(
-      { test: 'This is test token', email: 'dktdkqpekd@google.com' },
+      { test: 'This is test token', email: 'ltg0513@gmail.com' },
       process.env.SECRET_KEY,
     );
 
     request
       .agent(testExpress)
-      .get('/users/6374905f40e097569b7dd970/test-1')
+      .get('/users/637cbc4c71a61ffc5a10acee/test-1')
       .set('Authorization', `Bearer ${testToken}`)
       .expect(200)
       .expect({ result: 'ok' })
@@ -60,7 +60,7 @@ describe('04. Authentication test', () => {
 
     request
       .agent(testExpress)
-      .get('/users/6374905f40e097569b7dd970/test-1')
+      .get('/users/637cbc4c71a61ffc5a10acee/test-1')
       .set('Authorization', `Bearer ${testToken}`)
       .expect(401)
       .expect(res => {

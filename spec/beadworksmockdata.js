@@ -3,7 +3,7 @@ const beadworksData = [
     _id: '637492f5bc1aff2ace0a2191',
     title: 'first beadwork!',
     description: 'beadwork 1!!',
-    author: '6374905f40e097569b7dd970',
+    author: '637cbc4c71a61ffc5a10acee',
     beads: [
       '6374964d690ff5cb4a2f7394',
       '6374964d690ff5cb4a2f7395',
