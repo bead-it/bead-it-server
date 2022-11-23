@@ -4,16 +4,16 @@ const app = require('../app');
 const {
   createTestData,
   deleteTestData,
-  // backupOriginalData,
-  // restoreOriginalData,
+  backupOriginalData,
+  restoreOriginalData,
 } = require('./testUtils');
 
 const requestApp = request.agent(app);
-// let backupData;
+let backupData;
 
 describe('01. Beadwork test', () => {
-  xit('start', async () => {
-    // backupData = await backupOriginalData();
+  it('start', async () => {
+    backupData = await backupOriginalData();
     await deleteTestData();
     await createTestData();
   });
@@ -172,6 +172,6 @@ describe('01. Beadwork test', () => {
   it('end', async () => {
     await deleteTestData();
     await createTestData();
-    // await restoreOriginalData(backupData);
+    await restoreOriginalData(backupData);
   });
 });
