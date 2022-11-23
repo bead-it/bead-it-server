@@ -5,6 +5,7 @@ const {
   getBeadworkData,
   postBeadworkData,
   patchBeadworkData,
+  copyBeadworkContents,
 } = require('./middlewares/beadworkMiddlewares');
 const {
   endOfGetReq,
@@ -19,6 +20,7 @@ router.route('/').post(auth, postBeadworkData, endOfPostReq);
 router
   .route('/:beadworkId')
   .get(auth, getBeadworkData, endOfGetReq)
+  .post(auth, postBeadworkData, copyBeadworkContents, endOfPostReq)
   .patch(auth, patchBeadworkData, endOfPatchReq);
 
 module.exports = router;
