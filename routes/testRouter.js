@@ -3,6 +3,7 @@ const {
   createTestData,
   deleteTestData,
   backupOriginalData,
+  restoreOriginalData,
 } = require('../spec/testUtils');
 
 const router = express.Router();
@@ -19,7 +20,7 @@ router.route('/').post(async (req, res, next) => {
   }
 });
 
-router.route('/all-data').get(async (req, res, next) => {
+router.route('/backup').post(async (req, res, next) => {
   try {
     const data = await backupOriginalData();
     res.json({
@@ -27,7 +28,25 @@ router.route('/all-data').get(async (req, res, next) => {
       data,
     });
   } catch (error) {
-    error.message = `Error in testRouter.js : ${error.message}`;
+    error.message = `Error in backup in testRouter.js : ${error.message}`;
+
+    next(error);
+  }
+});
+
+router.route('/restore').post(async (req, res, next) => {
+  try {
+    const { data } = req.body;
+    if (!data) {
+      const error = new Error('No data for restoring!!');
+      error.status = 400;
+      throw error;
+    }
+
+    await restoreOriginalData(data);
+    res.json({ result: 'ok' });
+  } catch (error) {
+    error.message = `Error in restoring in testRouter.js : ${error.message}`;
 
     next(error);
   }
