@@ -9,14 +9,14 @@ const {
   backupOriginalData,
   restoreOriginalData,
 } = require('./testUtils');
-const { authTemp } = require('../routes/middlewares/authMiddlewares');
+const { auth } = require('../routes/middlewares/authMiddlewares');
 
 const testExpress = express();
 let backupData;
 
 testExpress.use(
   '/users/:userId/test-1',
-  authTemp,
+  auth,
   (req, res) => res.status(200).json({ result: 'ok' }),
   // eslint-disable-next-line no-unused-vars
   (err, req, res, next) => {

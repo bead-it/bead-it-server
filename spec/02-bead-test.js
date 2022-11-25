@@ -1,5 +1,7 @@
 const { expect } = require('chai');
 const request = require('supertest');
+const jwt = require('jsonwebtoken');
+
 const app = require('../app');
 const {
   createTestData,
@@ -10,6 +12,11 @@ const {
 
 const requestApp = request.agent(app);
 let backupData;
+
+const testToken = jwt.sign(
+  { test: 'This is test token', email: 'ltg0513@gmail.com' },
+  process.env.SECRET_KEY,
+);
 
 describe('02. Bead test', () => {
   it('start', async () => {
@@ -23,6 +30,7 @@ describe('02. Bead test', () => {
       .get(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191/beads/6374964d690ff5cb4a2f7394',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(200)
       .expect(res => {
         expect(res.body.result).equal('ok');
@@ -56,6 +64,7 @@ describe('02. Bead test', () => {
       .get(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2190/beads/6374964d690ff5cb4a2f7394',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(400)
       .expect({
         result: 'error',
@@ -74,6 +83,7 @@ describe('02. Bead test', () => {
       .get(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191/beads',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(200)
       .expect(res => {
         expect(res.body.result).equal('ok');
@@ -90,6 +100,7 @@ describe('02. Bead test', () => {
       .get(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2190/beads',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(400)
       .expect({
         result: 'error',
@@ -108,6 +119,7 @@ describe('02. Bead test', () => {
       .post(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191/beads',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .send({
         domain: 'domain_xx',
         url: 'url_xx',
@@ -144,6 +156,7 @@ describe('02. Bead test', () => {
       .patch(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191/beads/6374964d690ff5cb4a2f7394',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .send({
         tags: ['newtag_1', 'newtag_2', 'newtag_3'],
       })

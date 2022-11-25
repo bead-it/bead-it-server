@@ -3,11 +3,7 @@ const jwt = require('jsonwebtoken');
 const { authentication } = require('../../configs/firebase');
 const User = require('../../models/User');
 
-const auth = (req, res, next) => {
-  next();
-};
-
-const authTemp = async (req, res, next) => {
+const auth = async (req, res, next) => {
   try {
     const { userId } = req.params;
     if (!userId) {
@@ -98,4 +94,4 @@ const login = async (req, res, next) => {
   }
 };
 
-module.exports = { auth, authTemp, login };
+module.exports = { auth, login };
