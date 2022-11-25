@@ -1,5 +1,7 @@
 const Beadwork = require('../../models/Beadwork');
 const User = require('../../models/User');
+const Bead = require('../../models/Bead');
+const Thread = require('../../models/Thread');
 
 const getBeadworkData = async (req, res, next) => {
   try {
@@ -54,7 +56,7 @@ const postBeadworkData = async (req, res, next) => {
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { $push: { beadworks: beadworkId } },
+      { $push: { myBeadworks: beadworkId } },
       { returnDocument: 'after' },
     ).exec();
     if (!updatedUser) {
@@ -130,4 +132,91 @@ const patchBeadworkData = async (req, res, next) => {
   }
 };
 
-module.exports = { getBeadworkData, postBeadworkData, patchBeadworkData };
+const copyBeadworkContents = async (req, res, next) => {
+  try {
+    const { beadworkId } = req.params;
+    const prevBeadwork = await Beadwork.findById(beadworkId)
+      .populate('threads')
+      .exec();
+    if (!prevBeadwork) {
+      const error = new Error('Invalid beadworkId!!');
+      error.status = 400;
+      throw error;
+    }
+
+    const allBeadsSet = new Set(
+      prevBeadwork.beads.map(objId => objId.toString()),
+    );
+    const { selectedBeads } = req.body;
+    const selectedBeadsSet = new Set(selectedBeads);
+
+    if (!selectedBeads.every(beadId => allBeadsSet.has(beadId))) {
+      const error = new Error(
+        'Selected beads are not matched with with beadworkId!!',
+      );
+      error.status = 400;
+      throw error;
+    }
+
+    const newBeadwork = res.locals.data;
+    const { _id: newBeadworkId } = newBeadwork;
+
+    const originalBeads = await Bead.find({ _id: selectedBeads }).lean();
+    const newBeadsData = originalBeads.map(bead => {
+      return {
+        page: bead.page,
+        beadwork: newBeadworkId,
+      };
+    });
+    const newBeads = await Bead.create(newBeadsData);
+
+    const beadsMapping = {};
+
+    newBeads.forEach((bead, i) => {
+      const { _id: newBeadId } = bead;
+      beadsMapping[selectedBeads[i]] = newBeadId;
+    });
+
+    const newThreadsData = prevBeadwork.threads
+      .filter(thread => {
+        return (
+          selectedBeadsSet.has(thread.source.toString()) &&
+          selectedBeadsSet.has(thread.target.toString())
+        );
+      })
+      .map(thread => {
+        return {
+          source: beadsMapping[thread.source.toString()],
+          target: beadsMapping[thread.target.toString()],
+          content: thread.content,
+          beadwork: newBeadworkId,
+        };
+      });
+    const newThreads = await Thread.create(newThreadsData);
+
+    newBeadwork.beads = newBeads.map(bead => {
+      const { _id: beadId } = bead;
+      return beadId;
+    });
+
+    newBeadwork.threads = newThreads.map(thread => {
+      const { _id: threadId } = thread;
+      return threadId;
+    });
+
+    await newBeadwork.save();
+
+    next();
+  } catch (error) {
+    error.message = `Error in copyBeadworkContents in beadworkMiddlewares.js : ${error.message}`;
+
+    next(error);
+  }
+};
+
+module.exports = {
+  getBeadworkData,
+  postBeadworkData,
+  patchBeadworkData,
+  copyBeadworkContents,
+};

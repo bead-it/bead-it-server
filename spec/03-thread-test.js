@@ -1,5 +1,7 @@
 const { expect } = require('chai');
 const request = require('supertest');
+const jwt = require('jsonwebtoken');
+
 const app = require('../app');
 const {
   createTestData,
@@ -10,6 +12,11 @@ const {
 
 const requestApp = request.agent(app);
 let backupData;
+
+const testToken = jwt.sign(
+  { test: 'This is test token', email: 'ltg0513@gmail.com' },
+  process.env.SECRET_KEY,
+);
 
 describe('03. Thread test', () => {
   it('start', async () => {
@@ -23,6 +30,7 @@ describe('03. Thread test', () => {
       .get(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191/threads/63749732486fe6325f548f2a',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(200)
       .expect(res => {
         expect(res.body.result).equal('ok');
@@ -45,6 +53,7 @@ describe('03. Thread test', () => {
       .get(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2190/threads/63749732486fe6325f548f2a',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(400)
       .expect({
         result: 'error',
@@ -63,6 +72,7 @@ describe('03. Thread test', () => {
       .get(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191/threads/',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(200)
       .expect(res => {
         expect(res.body.result).equal('ok');
@@ -79,6 +89,7 @@ describe('03. Thread test', () => {
       .get(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2190/beads',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(400)
       .expect({
         result: 'error',
@@ -97,6 +108,7 @@ describe('03. Thread test', () => {
       .post(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191/threads',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .send({
         source: '6374964d690ff5cb4a2f7395',
         target: '6374964d690ff5cb4a2f7394',
@@ -122,6 +134,7 @@ describe('03. Thread test', () => {
       .patch(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191/threads/63749732486fe6325f548f2a',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .send({
         source: '6374964d690ff5cb4a2f7397',
         target: '6374964d690ff5cb4a2f7396',

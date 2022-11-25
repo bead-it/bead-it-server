@@ -1,19 +1,26 @@
 const { expect } = require('chai');
 const request = require('supertest');
+const jwt = require('jsonwebtoken');
+
 const app = require('../app');
 const {
   createTestData,
   deleteTestData,
-  // backupOriginalData,
-  // restoreOriginalData,
+  backupOriginalData,
+  restoreOriginalData,
 } = require('./testUtils');
 
 const requestApp = request.agent(app);
-// let backupData;
+let backupData;
+
+const testToken = jwt.sign(
+  { test: 'This is test token', email: 'ltg0513@gmail.com' },
+  process.env.SECRET_KEY,
+);
 
 describe('01. Beadwork test', () => {
-  xit('start', async () => {
-    // backupData = await backupOriginalData();
+  it('start', async () => {
+    backupData = await backupOriginalData();
     await deleteTestData();
     await createTestData();
   });
@@ -21,6 +28,7 @@ describe('01. Beadwork test', () => {
   it('01-1. Get beadwork data with valid beadworkId.', done => {
     requestApp
       .get('/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191')
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(200)
       .expect(res => {
         expect(res.body.result).equal('ok');
@@ -64,6 +72,7 @@ describe('01. Beadwork test', () => {
   it('01-2. Get beadwork data with invalid beadworkId.', done => {
     requestApp
       .get('/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2190')
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(400)
       .expect({
         result: 'error',
@@ -80,6 +89,7 @@ describe('01. Beadwork test', () => {
   it('01-3. Post beadwork with valid userId.', done => {
     requestApp
       .post('/users/637cbc4c71a61ffc5a10acee/beadworks')
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(201)
       .expect(res => {
         expect(res.body.result).equal('ok');
@@ -100,12 +110,13 @@ describe('01. Beadwork test', () => {
   it('01-4. Post beadwork with invalid userId.', done => {
     requestApp
       .post('/users/637cbc4c71a61ffc5a10aced/beadworks')
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(400)
       .expect({
         result: 'error',
         code: 400,
         message:
-          'Error occured in backend server : Error in postBeadworkData in beadworkMiddlewares.js : Invalid userId!!',
+          'Error occured in backend server : Error in auth in authMiddlewares.js : Invalid userId delivered!!',
       })
       .end(error => {
         if (error) done(error);
@@ -118,6 +129,7 @@ describe('01. Beadwork test', () => {
       .patch(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .send({
         title: 'title1',
         description: 'description1',
@@ -132,8 +144,9 @@ describe('01. Beadwork test', () => {
   it('01-6. Patch beadwork with invalid userId and beadworkId.', done => {
     requestApp
       .patch(
-        '/users/637cbc4c71a61ffc5a10aced/beadworks/637492f5bc1aff2ace0a2191',
+        '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2190',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .send({
         title: 'title1',
         description: 'description1',
@@ -156,6 +169,7 @@ describe('01. Beadwork test', () => {
       .patch(
         '/users/637cbc4c71a61ffc5a10acee/beadworks/637492f5bc1aff2ace0a2191',
       )
+      .set('Authorization', `Bearer ${testToken}`)
       .expect(400)
       .expect({
         result: 'error',
@@ -172,6 +186,6 @@ describe('01. Beadwork test', () => {
   it('end', async () => {
     await deleteTestData();
     await createTestData();
-    // await restoreOriginalData(backupData);
+    await restoreOriginalData(backupData);
   });
 });

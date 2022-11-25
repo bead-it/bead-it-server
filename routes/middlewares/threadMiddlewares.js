@@ -139,8 +139,8 @@ const patchThreadData = async (req, res, next) => {
       throw error;
     }
 
-    const { source, target, contents } = req.body;
-    if (!source && !target && !contents) {
+    const { source, target, content } = req.body;
+    if (!source && !target && !content) {
       const error = new Error('No data delivered!!');
       error.status = 400;
       throw error;
@@ -153,8 +153,8 @@ const patchThreadData = async (req, res, next) => {
     if (target) {
       updateTarget.target = target;
     }
-    if (contents) {
-      updateTarget.contents = contents;
+    if (content) {
+      updateTarget.content = content;
     }
 
     const user = await User.findById(userId).exec();
