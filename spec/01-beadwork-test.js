@@ -15,7 +15,8 @@ let backupData;
 
 const testToken = jwt.sign(
   { test: 'This is test token', email: 'ltg0513@gmail.com' },
-  process.env.SECRET_KEY,
+  process.env.PRIVATE_KEY,
+  { algorithm: 'RS256' },
 );
 
 describe('01. Beadwork test', () => {
@@ -36,7 +37,6 @@ describe('01. Beadwork test', () => {
           _id: '637492f5bc1aff2ace0a2191',
           title: 'first beadwork!',
           description: 'beadwork 1!!',
-          author: '637cbc4c71a61ffc5a10acee',
           beads: [
             '6374964d690ff5cb4a2f7394',
             '6374964d690ff5cb4a2f7395',
@@ -61,6 +61,16 @@ describe('01. Beadwork test', () => {
             '63749732486fe6325f548f32',
             '63749732486fe6325f548f33',
           ],
+        });
+        expect(res.body.data.author).to.deep.include({
+          _id: '637cbc4c71a61ffc5a10acee',
+          username: 'Taegeun Lim',
+          email: 'ltg0513@gmail.com',
+          googleId: 'bAECw98pXzYdMv4lMPg63JwPbGe2',
+          profile:
+            'https://lh3.googleusercontent.com/a/ALm5wu1T3n5hxZffiXm5oLkBmMJc-STXDPFIYVvvtUoz=s96-c',
+          myBeadworks: ['637492f5bc1aff2ace0a2191'],
+          sharedBeadworks: ['637492f5bc1aff2ace0a2191'],
         });
       })
       .end(error => {

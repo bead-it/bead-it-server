@@ -53,4 +53,10 @@ router.route('/restore-data').post(async (req, res, next) => {
   }
 });
 
+router.route('/error-test').get((req, res, next) => {
+  const error = new Error('test error!!');
+  error.status = 404;
+  next(error);
+});
+
 module.exports = router;
