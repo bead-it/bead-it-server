@@ -1,5 +1,6 @@
 const { GoogleAuthProvider, signInWithCredential } = require('firebase/auth');
 const jwt = require('jsonwebtoken');
+
 const { authentication } = require('../../configs/firebase');
 const User = require('../../models/User');
 
@@ -28,7 +29,7 @@ const auth = async (req, res, next) => {
 
     const token = authorization.split(' ')[1];
     try {
-      const verified = jwt.verify(token, process.env.SECRET_KEY);
+      const verified = jwt.verify(token, process.env.PUBLIC_KEY);
       if (user.email !== verified.email) {
         throw new Error('Email mismatched!!');
       }
@@ -80,8 +81,9 @@ const login = async (req, res, next) => {
 
     payload.id = userId;
 
-    const token = jwt.sign(payload, process.env.SECRET_KEY, {
+    const token = jwt.sign(payload, process.env.PRIVATE_KEY, {
       expiresIn: '8h',
+      algorithm: 'RS256',
     });
 
     res.locals.data = { beaditToken: token };

@@ -15,7 +15,8 @@ let backupData;
 
 const testToken = jwt.sign(
   { test: 'This is test token', email: 'ltg0513@gmail.com' },
-  process.env.SECRET_KEY,
+  process.env.PRIVATE_KEY,
+  { algorithm: 'RS256' },
 );
 
 describe('02. Bead test', () => {

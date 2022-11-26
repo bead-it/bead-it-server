@@ -40,7 +40,8 @@ describe('04. Authentication test', () => {
   it('04-1. Pass auth middleware with valid token.', done => {
     const testToken = jwt.sign(
       { test: 'This is test token', email: 'ltg0513@gmail.com' },
-      process.env.SECRET_KEY,
+      process.env.PRIVATE_KEY,
+      { algorithm: 'RS256' },
     );
 
     request

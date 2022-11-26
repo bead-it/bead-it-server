@@ -15,7 +15,8 @@ let backupData;
 
 const testToken = jwt.sign(
   { test: 'This is test token', email: 'ltg0513@gmail.com' },
-  process.env.SECRET_KEY,
+  process.env.PRIVATE_KEY,
+  { algorithm: 'RS256' },
 );
 
 describe('05. User test', () => {
@@ -39,8 +40,8 @@ describe('05. User test', () => {
           profile:
             'https://lh3.googleusercontent.com/a/ALm5wu1T3n5hxZffiXm5oLkBmMJc-STXDPFIYVvvtUoz=s96-c',
         });
-        expect(res.body.data.myBeadworks.length).equal(6);
-        expect(res.body.data.sharedBeadworks.length).equal(4);
+        expect(res.body.data.myBeadworks.length).equal(1);
+        expect(res.body.data.sharedBeadworks.length).equal(1);
       })
       .end(error => {
         if (error) done(error);
