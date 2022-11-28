@@ -15,7 +15,7 @@ let backupData;
 
 const testToken = jwt.sign(
   { test: 'This is test token', email: 'ltg0513@gmail.com' },
-  process.env.PRIVATE_KEY,
+  `-----BEGIN RSA PRIVATE KEY-----\n${process.env.PRIVATE_KEY}\n-----END RSA PRIVATE KEY-----`,
   { algorithm: 'RS256' },
 );
 

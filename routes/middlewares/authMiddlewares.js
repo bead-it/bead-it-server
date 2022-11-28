@@ -29,7 +29,10 @@ const auth = async (req, res, next) => {
 
     const token = authorization.split(' ')[1];
     try {
-      const verified = jwt.verify(token, process.env.PUBLIC_KEY);
+      const verified = jwt.verify(
+        token,
+        `-----BEGIN PUBLIC KEY-----\n${process.env.PUBLIC_KEY}\n-----END PUBLIC KEY-----`,
+      );
       if (user.email !== verified.email) {
         throw new Error('Email mismatched!!');
       }
@@ -81,10 +84,14 @@ const login = async (req, res, next) => {
 
     payload.id = userId;
 
-    const token = jwt.sign(payload, process.env.PRIVATE_KEY, {
-      expiresIn: '8h',
-      algorithm: 'RS256',
-    });
+    const token = jwt.sign(
+      payload,
+      `-----BEGIN RSA PRIVATE KEY-----\n${process.env.PRIVATE_KEY}\n-----END RSA PRIVATE KEY-----`,
+      {
+        expiresIn: '8h',
+        algorithm: 'RS256',
+      },
+    );
 
     res.locals.data = { beaditToken: token };
 
