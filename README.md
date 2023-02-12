@@ -8,7 +8,7 @@
 
 # 배포
 
-https://www.beadit.site/
+~~https://www.beadit.site/~~
 
 # Bead It !!
 
